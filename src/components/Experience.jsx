@@ -3,8 +3,12 @@ import { Physics } from "@react-three/rapier";
 import { BowlingLane } from "./BowlingLane";
 import { BowlingBall } from "./BowlingBall";
 import { BowlingPins } from "./BowlingPins";
+import { useControls } from "leva";
 
 export const Experience = () => {
+  const { debug } = useControls("Physics", {
+    debug: false,
+  });
   return (
     <>
       <OrbitControls makeDefault />
@@ -26,7 +30,7 @@ export const Experience = () => {
 
       <Environment preset="warehouse" />
 
-      <Physics gravity={[0, -9.81, 0]} debug={true}>
+      <Physics gravity={[0, -9.81, 0]} debug={debug}>
         <BowlingLane />
         <BowlingBall position={[0, 1, -5]} />
         <BowlingPins basePosition={[0, 0.2, 4]} />

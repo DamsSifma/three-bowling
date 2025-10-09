@@ -1,8 +1,13 @@
 import { RigidBody } from "@react-three/rapier";
+import { useControls } from "leva";
 import { useRef } from "react";
 
 export const BowlingLane = () => {
   const laneRef = useRef();
+  const { laneFriction, laneRestitution } = useControls("Lane", {
+    laneFriction: { value: 0.1, min: 0, max: 1, step: 0.05 },
+    laneRestitution: { value: 0.3, min: 0, max: 1, step: 0.05 },
+  });
 
   const laneLength = 12;
   const laneWidth = 1.2;
@@ -10,7 +15,14 @@ export const BowlingLane = () => {
 
   return (
     <group>
-      <RigidBody type="fixed" friction={0} ref={laneRef}>
+      <RigidBody
+        // this key is to force remount when friction or restitution change
+        key={`lane-${laneFriction}-${laneRestitution}`}
+        type="fixed"
+        friction={laneFriction}
+        restitution={laneRestitution}
+        ref={laneRef}
+      >
         <mesh position={[0, -laneThickness / 2, 0]} receiveShadow>
           <boxGeometry args={[laneWidth, laneThickness, laneLength]} />
           <meshStandardMaterial

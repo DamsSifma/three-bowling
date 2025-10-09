@@ -17,9 +17,9 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       aimX: { value: 0, min: -0.5, max: 0.5, step: 0.01 },
       spinX: { value: -1.5, min: -5, max: 5, step: 0.1 },
       spinY: { value: 0, min: -3, max: 3, step: 0.1 },
-      restitution: { value: 0.2, min: 0, max: 1, step: 0.05 },
-      friction: { value: 0.1, min: 0, max: 2, step: 0.1 },
-      ballMass: { value: 15, min: 5, max: 30, step: 1 },
+      restitution: { value: 0.75, min: 0, max: 1, step: 0.05 },
+      friction: { value: 0.2, min: 0, max: 2, step: 0.1 },
+      ballMass: { value: 25, min: 5, max: 30, step: 1 },
     });
 
   const resetBall = useCallback(() => {
@@ -83,6 +83,7 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
         friction={friction}
         canSleep={false}
         colliders="ball"
+        ccd={true}
       >
         <mesh castShadow>
           <sphereGeometry args={[ballRadius]} />

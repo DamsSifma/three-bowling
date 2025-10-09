@@ -1,8 +1,4 @@
-import {
-  ConvexHullCollider,
-  CylinderCollider,
-  RigidBody,
-} from "@react-three/rapier";
+import { RigidBody } from "@react-three/rapier";
 import { BowlingPin } from "./BowlingPin.jsx";
 import { useControls, button } from "leva";
 import { useRef, useMemo } from "react";
@@ -48,9 +44,9 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
         step: 0.01,
       },
       rowSpacing: { value: 0.33, min: 0.1, max: 0.5, step: 0.01 },
-      pinMass: { value: 0.5, min: 0.1, max: 2, step: 0.1 },
+      pinMass: { value: 1.5, min: 0.1, max: 2, step: 0.1 },
       pinFriction: { value: 0.1, min: 0, max: 1, step: 0.05 },
-      pinRestitution: { value: 0.05, min: 0, max: 0.5, step: 0.05 },
+      pinRestitution: { value: 0.1, min: 0, max: 1, step: 0.05 },
     });
 
   const pinPositions = [
@@ -123,7 +119,7 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
         console.log(`Resetting pin ${index} to:`, position);
         pinRef.setTranslation({
           x: position[0],
-          y: position[1] + 0.2,
+          y: position[1] + 0.01,
           z: position[2],
         });
         pinRef.setRotation({ x: 0, y: 0, z: 0, w: 1 }); // remet la quille droite
@@ -142,14 +138,15 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
     <group>
       {pinPositions.map((position, index) => (
         <RigidBody
-          key={index}
+          key={`pin-${index}-${pinMass}-${pinFriction}-${pinRestitution}`}
           ref={(el) => (pinRefs.current[index] = el)}
-          position={[position[0], position[1] + 0.2, position[2]]}
+          position={[position[0], position[1] + 0.01, position[2]]}
           type="dynamic"
           mass={pinMass}
           restitution={pinRestitution}
           friction={pinFriction}
           colliders="hull"
+          ccd={true}
         >
           <BowlingPin scale={0.4} />
         </RigidBody>
