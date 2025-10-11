@@ -3,11 +3,13 @@ import { Canvas } from "@react-three/fiber";
 import { Experience } from "./components/Experience";
 import { Leva, useControls } from "leva";
 import { Perf } from "r3f-perf";
+import { GameUI } from "./components/GameUI";
 
 function App() {
   const { backgroundColor } = useControls("Colors", {
     backgroundColor: { value: "#1e1e1e" },
   });
+
   return (
     <>
       <Leva theme={{ sizes: { rootWidth: "350px" } }} />
@@ -16,6 +18,7 @@ function App() {
         <color attach="background" args={[backgroundColor]} />
         <Experience />
       </Canvas>
+      <GameUI />
     </>
   );
 }

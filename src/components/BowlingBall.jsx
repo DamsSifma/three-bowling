@@ -1,8 +1,8 @@
 import { useControls } from "leva";
 import { RigidBody } from "@react-three/rapier";
-import { Html } from "@react-three/drei";
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useGameState } from "../hooks/useGameState";
 
 export const BowlingBall = ({ position = [0, 1, -5] }) => {
   const ballRef = useRef();
@@ -21,6 +21,8 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       friction: { value: 0.2, min: 0, max: 2, step: 0.1 },
       ballMass: { value: 25, min: 5, max: 30, step: 1 },
     });
+
+  const { setIsRolling: setIsRollingGlobal, setBallRef } = useGameState();
 
   const resetBall = useCallback(() => {
     if (ballRef.current) {
@@ -56,103 +58,45 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
     }
   }, [power, aimX, spinX, spinY, isRolling]);
 
+  useEffect(() => {
+    setBallRef({
+      throwBall,
+      resetBall,
+    });
+  }, [throwBall, resetBall, setBallRef]);
+
+  useEffect(() => {
+    setIsRollingGlobal(isRolling);
+  }, [isRolling, setIsRollingGlobal]);
+
   // Auto reset si la balle va trop loin
   useFrame(() => {
     if (ballRef.current) {
       const pos = ballRef.current.translation();
       const vel = ballRef.current.linvel();
 
-      if (
-        pos.z > 8 ||
-        pos.y < -5 ||
-        (isRolling && Math.abs(vel.x) + Math.abs(vel.z) < 0.1)
-      ) {
-        setTimeout(resetBall, 2000);
+      if (pos.z > 8 || pos.y < -1 || Math.abs(pos.x) > 2 || pos.y > 5) {
+        setTimeout(resetBall, 1000);
       }
     }
   });
 
   return (
-    <>
-      <RigidBody
-        ref={ballRef}
-        position={position}
-        type="dynamic"
-        mass={ballMass}
-        restitution={restitution}
-        friction={friction}
-        canSleep={false}
-        colliders="ball"
-        ccd={true}
-      >
-        <mesh castShadow>
-          <sphereGeometry args={[ballRadius]} />
-          <meshStandardMaterial
-            color="#1a1a1a"
-            roughness={0.8}
-            metalness={0.1}
-          />
-        </mesh>
-      </RigidBody>
-
-      {/* TODO enlever quand polished interface */}
-      <Html position={[-2, 2, -4]}>
-        <div
-          style={{
-            background: "rgba(0,0,0,0.8)",
-            color: "white",
-            padding: "10px",
-            borderRadius: "5px",
-            fontFamily: "monospace",
-            fontSize: "12px",
-          }}
-        >
-          <div style={{ marginBottom: "10px" }}>
-            <strong>Bowling Game</strong>
-            <br />
-            Balls thrown: {ballsThrown}
-          </div>
-          <button
-            onClick={throwBall}
-            style={{
-              margin: "2px",
-              padding: "8px 16px",
-              backgroundColor: isRolling ? "#666" : "#4CAF50",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: isRolling ? "not-allowed" : "pointer",
-            }}
-            disabled={isRolling}
-          >
-            {isRolling ? "Rolling..." : "THROW BALL"}
-          </button>
-          <button
-            onClick={resetBall}
-            style={{
-              margin: "2px",
-              padding: "8px 16px",
-              backgroundColor: "#f44336",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Reset
-          </button>
-          <div style={{ marginTop: "10px", fontSize: "10px" }}>
-            Use Leva controls to adjust:
-            <br />
-            • Power: Ball speed
-            <br />
-            • Aim X: Left/right direction
-            <br />
-            • Spin X/Y: Ball rotation
-            <br />• Physics properties
-          </div>
-        </div>
-      </Html>
-    </>
+    <RigidBody
+      ref={ballRef}
+      position={position}
+      type="dynamic"
+      mass={ballMass}
+      restitution={restitution}
+      friction={friction}
+      canSleep={false}
+      colliders="ball"
+      ccd={true}
+    >
+      <mesh castShadow>
+        <sphereGeometry args={[ballRadius]} />
+        <meshStandardMaterial color="#1a1a1a" roughness={0.8} metalness={0.1} />
+      </mesh>
+    </RigidBody>
   );
 };

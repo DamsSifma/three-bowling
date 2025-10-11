@@ -12,6 +12,8 @@ export const BowlingLane = () => {
   const laneLength = 12;
   const laneWidth = 1.2;
   const laneThickness = 0.1;
+  const gutterWidth = 0.3;
+  const gutterDepth = 0.15;
 
   return (
     <group>
@@ -34,37 +36,80 @@ export const BowlingLane = () => {
       </RigidBody>
 
       {/* Gouttière droite */}
-      <RigidBody type="fixed">
-        <mesh position={[-laneWidth / 2 - 0.15, 0, 0]} receiveShadow>
-          <boxGeometry args={[0.3, 0.1, laneLength]} />
+      <RigidBody type="fixed" friction={0.1} restitution={0.2}>
+        <mesh
+          position={[
+            -laneWidth / 2 - gutterWidth / 2,
+            -gutterDepth - laneThickness / 2,
+            0,
+          ]}
+          receiveShadow
+        >
+          <boxGeometry args={[gutterWidth, laneThickness, laneLength]} />
+          <meshStandardMaterial color="#2a2a2a" roughness={0.6} />
+        </mesh>
+        {/* mur intérieurs */}
+        <mesh
+          position={[-laneWidth / 2 - 0.01, -gutterDepth / 2, 0]}
+          receiveShadow
+        >
+          <boxGeometry args={[0.02, gutterDepth, laneLength]} />
+          <meshStandardMaterial color="#333333" />
+        </mesh>
+        {/* murs extérieurs */}
+        <mesh
+          position={[-laneWidth / 2 - gutterWidth + 0.01, -gutterDepth / 2, 0]}
+          receiveShadow
+        >
+          <boxGeometry args={[0.02, gutterDepth, laneLength]} />
           <meshStandardMaterial color="#333333" />
         </mesh>
       </RigidBody>
 
       {/* Gouttière gauche */}
-      <RigidBody type="fixed">
-        <mesh position={[laneWidth / 2 + 0.15, 0, 0]} receiveShadow>
-          <boxGeometry args={[0.3, 0.1, laneLength]} />
+      <RigidBody type="fixed" friction={0.1} restitution={0.2}>
+        <mesh
+          position={[
+            laneWidth / 2 + gutterWidth / 2,
+            -gutterDepth - laneThickness / 2,
+            0,
+          ]}
+          receiveShadow
+        >
+          <boxGeometry args={[gutterWidth, laneThickness, laneLength]} />
+          <meshStandardMaterial color="#2a2a2a" roughness={0.6} />
+        </mesh>
+        <mesh
+          position={[laneWidth / 2 + 0.01, -gutterDepth / 2, 0]}
+          receiveShadow
+        >
+          <boxGeometry args={[0.02, gutterDepth, laneLength]} />
           <meshStandardMaterial color="#333333" />
         </mesh>
-      </RigidBody>
-
-      {/* Mur invisible qui contiennent la simulation physique */}
-      <RigidBody type="fixed">
-        <mesh position={[-laneWidth / 2 - 0.3, 1, 0]} visible={false}>
-          <boxGeometry args={[0.1, 2, laneLength]} />
-        </mesh>
-      </RigidBody>
-
-      <RigidBody type="fixed">
-        <mesh position={[laneWidth / 2 + 0.3, 1, 0]} visible={false}>
-          <boxGeometry args={[0.1, 2, laneLength]} />
+        <mesh
+          position={[laneWidth / 2 + gutterWidth - 0.01, -gutterDepth / 2, 0]}
+          receiveShadow
+        >
+          <boxGeometry args={[0.02, gutterDepth, laneLength]} />
+          <meshStandardMaterial color="#333333" />
         </mesh>
       </RigidBody>
 
       <RigidBody type="fixed">
         <mesh position={[0, 1, laneLength / 2 + 0.5]} visible={false}>
-          <boxGeometry args={[laneWidth + 1, 2, 0.1]} />
+          <boxGeometry args={[laneWidth, 2, 0.1]} />
+        </mesh>
+        <mesh
+          position={[-laneWidth / 2 - gutterWidth - 0.1, 1, 0]}
+          visible={false}
+        >
+          <boxGeometry args={[0.1, 2, laneLength]} />
+        </mesh>
+        <mesh
+          position={[laneWidth / 2 + gutterWidth + 0.1, 1, 0]}
+          visible={false}
+        >
+          <boxGeometry args={[0.1, 2, laneLength]} />
         </mesh>
       </RigidBody>
     </group>
