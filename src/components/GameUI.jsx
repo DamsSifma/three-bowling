@@ -1,7 +1,8 @@
 import { useGameState } from "../hooks/useGameState";
 
 export const GameUI = () => {
-  const { ballsThrown, isRolling, throwBall, resetBall } = useGameState();
+  const { ballsThrown, isRolling, throwBall, resetBall, pinsDown, pinStates } =
+    useGameState();
 
   return (
     <div
@@ -19,6 +20,21 @@ export const GameUI = () => {
         zIndex: 1000,
       }}
     >
+      <div style={{ marginBottom: "15px" }}>
+        <h3 style={{ margin: "0 0 10px 0", fontSize: "16px" }}>
+          🎳 Bowling Game
+        </h3>
+        <div>
+          Balls thrown: <strong>{ballsThrown}</strong>
+        </div>
+        <div>
+          Pins down: <strong>{pinsDown}/10</strong>
+        </div>
+        {pinsDown === 10 && (
+          <div style={{ color: "#4CAF50", fontWeight: "bold" }}>🎉 STRIKE!</div>
+        )}
+      </div>
+
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         <button
           onClick={throwBall}

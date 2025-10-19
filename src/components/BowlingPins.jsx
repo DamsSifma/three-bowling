@@ -1,7 +1,9 @@
 import { RigidBody } from "@react-three/rapier";
 import { BowlingPin } from "./BowlingPin.jsx";
 import { useControls, button } from "leva";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
+import { useGameState } from "../hooks/useGameState";
+import { useFrame } from "@react-three/fiber";
 
 // TODO: enlever le commentaire mais c'est pour le texte du writeup
 // const BowlingPin = ({ position, index }) => {
@@ -34,20 +36,30 @@ import { useRef, useMemo } from "react";
 
 export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
   const pinRefs = useRef([]);
+  const { setPinRefs, checkPins, resetPinCount, pinStates, isRolling } =
+    useGameState();
+  const lastCheckTime = useRef(0);
 
-  const { spacing, rowSpacing, pinMass, pinFriction, pinRestitution } =
-    useControls("Pins", {
-      spacing: {
-        value: 0.23,
-        min: 0.05,
-        max: 0.3,
-        step: 0.01,
-      },
-      rowSpacing: { value: 0.33, min: 0.1, max: 0.5, step: 0.01 },
-      pinMass: { value: 1.5, min: 0.1, max: 2, step: 0.1 },
-      pinFriction: { value: 0.1, min: 0, max: 1, step: 0.05 },
-      pinRestitution: { value: 0.1, min: 0, max: 1, step: 0.05 },
-    });
+  const {
+    spacing,
+    rowSpacing,
+    pinMass,
+    pinFriction,
+    pinRestitution,
+    debugColliders,
+  } = useControls("Pins", {
+    spacing: {
+      value: 0.23,
+      min: 0.05,
+      max: 0.3,
+      step: 0.01,
+    },
+    rowSpacing: { value: 0.33, min: 0.1, max: 0.5, step: 0.01 },
+    pinMass: { value: 1.5, min: 0.1, max: 2, step: 0.1 },
+    pinFriction: { value: 0.1, min: 0, max: 1, step: 0.05 },
+    pinRestitution: { value: 0.1, min: 0, max: 1, step: 0.05 },
+    debugColliders: false,
+  });
 
   const pinPositions = [
     [basePosition[0] - spacing * 1.5, basePosition[1], basePosition[2]],
@@ -116,7 +128,6 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
     freshPositions.forEach((position, index) => {
       const pinRef = pinRefs.current[index];
       if (pinRef) {
-        console.log(`Resetting pin ${index} to:`, position);
         pinRef.setTranslation({
           x: position[0],
           y: position[1] + 0.01,
@@ -127,7 +138,20 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
         pinRef.setAngvel({ x: 0, y: 0, z: 0 });
       }
     });
+
+    resetPinCount();
   };
+
+  useEffect(() => {
+    setPinRefs(pinRefs.current);
+  }, [setPinRefs]);
+
+  useFrame((state) => {
+    if (isRolling && state.clock.elapsedTime - lastCheckTime.current > 0.2) {
+      checkPins();
+      lastCheckTime.current = state.clock.elapsedTime;
+    }
+  });
 
   // Add reset button to controls
   useControls("Pins Actions", {
@@ -149,6 +173,13 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
           ccd={true}
         >
           <BowlingPin scale={0.4} />
+          {/* Debug indicator when pin is down */}
+          {debugColliders && pinStates[index] && (
+            <mesh position={[0, 0.3, 0]}>
+              <sphereGeometry args={[0.05]} />
+              <meshBasicMaterial color="#ff0000" />
+            </mesh>
+          )}
         </RigidBody>
       ))}
     </group>

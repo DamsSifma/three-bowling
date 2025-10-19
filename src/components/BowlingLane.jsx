@@ -50,10 +50,10 @@ export const BowlingLane = () => {
         </mesh>
         {/* mur intérieurs */}
         <mesh
-          position={[-laneWidth / 2 - 0.01, -gutterDepth / 2, 0]}
+          position={[-laneWidth / 2 - 0.01, -gutterDepth / 2 - 0.02, 0]}
           receiveShadow
         >
-          <boxGeometry args={[0.02, gutterDepth, laneLength]} />
+          <boxGeometry args={[0.02, gutterDepth - 0.04, laneLength]} />
           <meshStandardMaterial color="#333333" />
         </mesh>
         {/* murs extérieurs */}
@@ -80,10 +80,10 @@ export const BowlingLane = () => {
           <meshStandardMaterial color="#2a2a2a" roughness={0.6} />
         </mesh>
         <mesh
-          position={[laneWidth / 2 + 0.01, -gutterDepth / 2, 0]}
+          position={[laneWidth / 2 + 0.01, -gutterDepth / 2 - 0.02, 0]}
           receiveShadow
         >
-          <boxGeometry args={[0.02, gutterDepth, laneLength]} />
+          <boxGeometry args={[0.02, gutterDepth - 0.04, laneLength]} />
           <meshStandardMaterial color="#333333" />
         </mesh>
         <mesh

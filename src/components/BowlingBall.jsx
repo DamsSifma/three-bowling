@@ -7,7 +7,6 @@ import { useGameState } from "../hooks/useGameState";
 export const BowlingBall = ({ position = [0, 1, -5] }) => {
   const ballRef = useRef();
   const [isRolling, setIsRolling] = useState(false);
-  const [ballsThrown, setBallsThrown] = useState(0);
 
   const ballRadius = 0.11;
 
@@ -34,29 +33,30 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       ballRef.current.setLinvel({ x: 0, y: 0, z: 0 });
       ballRef.current.setAngvel({ x: 0, y: 0, z: 0 });
       setIsRolling(false);
+      setIsRollingGlobal(false);
     }
-  }, [position]);
+  }, [position, setIsRollingGlobal]);
 
   const throwBall = useCallback(() => {
     if (ballRef.current && !isRolling) {
       setIsRolling(true);
-      setBallsThrown((prev) => prev + 1);
+      setIsRollingGlobal(true);
 
       // Apply linear velocity
       ballRef.current.setLinvel({
-        x: aimX * power,
+        x: aimX * power * 0.1,
         y: 0,
         z: power,
       });
 
       // Apply angular velocity (spin)
-      ballRef.current.setAngvel({
-        x: spinX * power * 0.3,
-        y: spinY * power * 0.3,
-        z: 0,
-      });
+      // ballRef.current.setAngvel({
+      //   x: spinX * power * 0.3,
+      //   y: spinY * power * 0.3,
+      //   z: 0,
+      // });
     }
-  }, [power, aimX, spinX, spinY, isRolling]);
+  }, [power, aimX, spinX, spinY, isRolling, setIsRollingGlobal]);
 
   useEffect(() => {
     setBallRef({
@@ -64,10 +64,6 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       resetBall,
     });
   }, [throwBall, resetBall, setBallRef]);
-
-  useEffect(() => {
-    setIsRollingGlobal(isRolling);
-  }, [isRolling, setIsRollingGlobal]);
 
   // Auto reset si la balle va trop loin
   useFrame(() => {
@@ -92,6 +88,8 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       canSleep={false}
       colliders="ball"
       ccd={true}
+      // linearDamping={0.05} // Mini mal air resistance
+      // angularDamping={0.05}
     >
       <mesh castShadow>
         <sphereGeometry args={[ballRadius]} />
