@@ -1,9 +1,10 @@
 import { RigidBody } from "@react-three/rapier";
 import { BowlingPin } from "./BowlingPin.jsx";
 import { useControls, button } from "leva";
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, useCallback, Suspense } from "react";
 import { useGameState } from "../hooks/useGameState";
 import { useFrame } from "@react-three/fiber";
+import useSoundBoard from "../hooks/useSoundBoard.js";
 
 // TODO: enlever le commentaire mais c'est pour le texte du writeup
 // const BowlingPin = ({ position, index }) => {
@@ -36,6 +37,7 @@ import { useFrame } from "@react-three/fiber";
 
 export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
   const pinRefs = useRef([]);
+  const { sounds, loaded, allSoundsLoaded } = useSoundBoard();
   const { setPinRefs, checkPins, resetPinCount, pinStates, isRolling } =
     useGameState();
   const lastCheckTime = useRef(0);
@@ -153,6 +155,15 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
     }
   });
 
+  const handlePinCollision = useCallback(
+    (index) => (event) => {
+      if (allSoundsLoaded && sounds.pinHit) {
+        sounds.pinHit();
+      }
+    },
+    [sounds, allSoundsLoaded]
+  );
+
   // Add reset button to controls
   useControls("Pins Actions", {
     "Reset Pins": button(resetPins),
@@ -171,6 +182,7 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
           friction={pinFriction}
           colliders="hull"
           ccd={true}
+          onCollisionEnter={handlePinCollision(index)}
         >
           <BowlingPin scale={0.4} />
           {/* Debug indicator when pin is down */}
