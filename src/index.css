@@ -6,3 +6,98 @@
 body {
   margin: 0;
 }
+
+.main-menu {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.main-menu-title {
+  font-size: 4rem;
+  text-align: center;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.button {
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.button-primary {
+  padding: 1rem 3rem;
+  font-size: 1.5rem;
+  background-color: rgba(76, 175, 80, 0.7);
+  border: 2px solid rgba(76, 175, 80, 0.5);
+}
+
+.button-primary:hover {
+  background-color: rgba(69, 160, 73, 0.9);
+  border-color: rgba(76, 175, 80, 0.8);
+  transform: translateY(-2px);
+}
+
+.button-secondary {
+  padding: 0.8rem 2.5rem;
+  font-size: 1.2rem;
+  background-color: rgba(33, 150, 243, 0.7);
+  border: 2px solid rgba(33, 150, 243, 0.5);
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.button-secondary:hover {
+  background-color: rgba(25, 118, 210, 0.9);
+  border-color: rgba(33, 150, 243, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+.subtitle {
+  margin-top: 3rem;
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.footer {
+  position: absolute;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.author {
+  opacity: 0.6;
+  margin: 0;
+}
+
+.github-link {
+  color: #4ecdc4;
+  text-decoration: none;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

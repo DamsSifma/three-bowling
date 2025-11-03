@@ -1,6 +1,6 @@
 import { useGameState } from "../hooks/useGameState";
 
-export const GameUI = () => {
+export const GameUI = ({ onBackToMenu }) => {
   const { ballsThrown, isRolling, throwBall, resetBall, pinsDown, pinStates } =
     useGameState();
 
@@ -68,6 +68,22 @@ export const GameUI = () => {
           }}
         >
           🔄 Reset Ball
+        </button>
+
+        <button
+          onClick={onBackToMenu}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#9C27B0",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "11px",
+            transition: "background-color 0.2s",
+          }}
+        >
+          🏠 MENU
         </button>
       </div>
     </div>
