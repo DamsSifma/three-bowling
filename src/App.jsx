@@ -5,28 +5,30 @@ import { Leva, useControls } from "leva";
 import { Perf } from "r3f-perf";
 import { GameUI } from "./components/GameUI";
 import { MainMenu } from "./components/MainMenu";
+import { useGameState } from "./hooks/useGameState";
 
 function App() {
-  const [gameState, setGameState] = useState("menu");
+  const [appState, setAppState] = useState("menu");
+  const { startGame } = useGameState();
 
   const { backgroundColor } = useControls("Colors", {
     backgroundColor: { value: "#1e1e1e" },
   });
 
-  // TODO gérer les états avec un hook custom ou dans useGameState
   const handleStartGame = () => {
-    setGameState("playing");
+    startGame();
+    setAppState("playing");
   };
 
   const handleBackToMenu = () => {
-    setGameState("menu");
+    setAppState("menu");
   };
 
   return (
     <>
       <Leva theme={{ sizes: { rootWidth: "350px" } }} />
 
-      {gameState === "playing" && (
+      {appState === "playing" && (
         <>
           <Canvas shadows camera={{ position: [0, 4, -2], fov: 60 }}>
             <Perf showGraph={false} position="top-left" />
@@ -37,7 +39,7 @@ function App() {
         </>
       )}
 
-      {gameState === "menu" && <MainMenu onStartGame={handleStartGame} />}
+      {appState === "menu" && <MainMenu onStartGame={handleStartGame} />}
     </>
   );
 }

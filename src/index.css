@@ -1,3 +1,19 @@
+:root {
+  --primary: #4a90e2;
+  --success: #4CAF50;
+  --danger: #f44336;
+  --warning: #ff9800;
+  --accent: #4ecdc4;
+  
+  --bg-light: #f8f9fa;
+  --bg-white: #ffffff;
+  --text-dark: #212529;
+  --text-muted: #495057;
+  --border-light: #dee2e6;
+  --highlight-blue: #e3f2fd;
+  --highlight-green: #e8f5e8;
+}
+
 #root {
   width: 100vw;
   height: 100vh;
@@ -23,7 +39,7 @@ body {
 .main-menu-title {
   font-size: 4rem;
   text-align: center;
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+  background: linear-gradient(45deg, #ff6b6b, var(--accent), var(--primary));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -94,10 +110,306 @@ body {
 }
 
 .github-link {
-  color: #4ecdc4;
+  color: var(--accent);
   text-decoration: none;
   opacity: 0.8;
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+/* Scoreboard Styles */
+.scoreboard {
+  background: var(--bg-light);
+  color: var(--text-dark);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: 'Courier New', monospace;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.scoreboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--primary);
+}
+
+.scoreboard-header h2 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.total-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.score-label {
+  color: var(--primary);
+}
+
+.score-value {
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.frame-container {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding: 4px;
+}
+
+.frame {
+  flex: 1;
+  min-width: 80px;
+  border: 2px solid var(--primary);
+  border-radius: 4px;
+  background: var(--bg-white);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.frame.current {
+  border-color: var(--primary);
+  background: var(--highlight-blue);
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.2);
+}
+
+.frame.complete {
+  background: var(--highlight-green);
+  border-color: var(--success);
+}
+
+.frame-number {
+  text-align: center;
+  font-weight: bold;
+  padding: 4px;
+  background: var(--primary);
+  color: white;
+  font-size: 0.9rem;
+}
+
+.throws {
+  padding: 4px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+}
+
+.throw-boxes {
+  display: flex;
+  flex: 1;
+  gap: 1px;
+}
+
+.throw-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-white);
+  border: 1px solid var(--primary);
+  font-weight: bold;
+  font-size: 1.1rem;
+  min-height: 30px;
+  color: var(--text-dark);
+}
+
+.throw-box.first {
+  border-radius: 2px 0 0 2px;
+}
+
+.throw-box.second {
+  border-radius: 0 2px 2px 0;
+}
+
+.tenth-frame .throw-boxes {
+  flex-direction: row;
+}
+
+.tenth-frame .throw-box {
+  flex: 1;
+  border-radius: 2px;
+}
+
+.frame-score {
+  text-align: center;
+  font-weight: bold;
+  padding: 4px;
+  background: var(--primary);
+  color: white;
+  font-size: 1rem;
+  border-top: 1px solid var(--primary);
+}
+
+.game-status {
+  text-align: center;
+  padding: 12px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.game-complete {
+  background: var(--highlight-green);
+  color: var(--success);
+  border: 1px solid var(--success);
+  font-size: 1.2rem;
+  padding: 16px;
+}
+
+.current-frame {
+  background: var(--highlight-blue);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+/* GameUI Styles */
+.scoreboard-wrapper {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1000px;
+  z-index: 1000;
+}
+
+.game-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  min-width: 250px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.game-info {
+  margin-bottom: 15px;
+}
+
+.game-title {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.game-status-message {
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--primary);
+}
+
+.pins-status {
+  margin-bottom: 8px;
+}
+
+.strike-notification {
+  color: #ff6b6b;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.spare-notification {
+  color: var(--accent);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.game-button {
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.throw-button {
+  padding: 12px 20px;
+  font-size: 14px;
+}
+
+.throw-button.enabled {
+  background-color: var(--success);
+}
+
+.throw-button.disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.next-frame-button {
+  padding: 12px 20px;
+  background-color: var(--primary);
+  font-size: 14px;
+}
+
+.reset-button {
+  padding: 10px 20px;
+  background-color: var(--danger);
+  font-size: 12px;
+}
+
+.debug-button {
+  padding: 8px 16px;
+  background-color: var(--warning);
+  font-size: 11px;
+}
+
+.menu-button {
+  padding: 8px 16px;
+  background-color: #9C27B0;
+  font-size: 11px;
+}
+
+/* Responsive design for scoreboard */
+@media (max-width: 768px) {
+  .scoreboard {
+    padding: 12px;
+    margin: 8px;
+  }
+  
+  .frame-container {
+    overflow-x: scroll;
+    padding-bottom: 8px;
+  }
+  
+  .frame {
+    min-width: 70px;
+  }
+  
+  .throw-box {
+    font-size: 1rem;
+    min-height: 25px;
+  }
+  
+  .scoreboard-header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
 }

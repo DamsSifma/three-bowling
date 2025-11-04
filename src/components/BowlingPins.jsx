@@ -38,8 +38,15 @@ import useSoundBoard from "../hooks/useSoundBoard.js";
 export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
   const pinRefs = useRef([]);
   const { sounds, loaded, allSoundsLoaded } = useSoundBoard();
-  const { setPinRefs, checkPins, resetPinCount, pinStates, isRolling } =
-    useGameState();
+  const {
+    setPinRefs,
+    checkPins,
+    resetPinCount,
+    resetPinsSelective,
+    pinStates,
+    isRolling,
+    getGameInfo,
+  } = useGameState();
   const lastCheckTime = useRef(0);
 
   const {
@@ -87,16 +94,8 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
     [basePosition[0], basePosition[1], basePosition[2] - rowSpacing * 3],
   ];
 
-  const resetPins = () => {
-    console.log(
-      "Reset pins - current spacing:",
-      spacing,
-      "rowSpacing:",
-      rowSpacing
-    );
-
-    // TOFIX je recalcule les positions car avec un useMemo sur pinPositions ça ne marche pas
-    const freshPositions = [
+  const getFreshPositions = () => {
+    return [
       [basePosition[0] - spacing * 1.5, basePosition[1], basePosition[2]],
       [basePosition[0] - spacing * 0.5, basePosition[1], basePosition[2]],
       [basePosition[0] + spacing * 0.5, basePosition[1], basePosition[2]],
@@ -124,7 +123,17 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
       ],
       [basePosition[0], basePosition[1], basePosition[2] - rowSpacing * 3],
     ];
+  };
 
+  const resetPins = () => {
+    console.log(
+      "Reset pins - current spacing:",
+      spacing,
+      "rowSpacing:",
+      rowSpacing
+    );
+
+    const freshPositions = getFreshPositions();
     console.log("Fresh positions:", freshPositions);
 
     freshPositions.forEach((position, index) => {
@@ -142,6 +151,64 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
     });
 
     resetPinCount();
+  };
+
+  const resetPinsIntelligent = () => {
+    const gameInfo = getGameInfo();
+    const needsFullReset = gameInfo.needsFullReset;
+
+    console.log("Smart pin reset called:", {
+      needsFullReset,
+      currentFrame: gameInfo.currentFrame,
+      currentThrow: gameInfo.currentThrow,
+      pinStates,
+      pinsDown: gameInfo.frames[gameInfo.currentFrame]?.throws || [],
+    });
+
+    if (needsFullReset) {
+      console.log("Full reset pins");
+      resetPinCount();
+      resetPins();
+    } else {
+      console.log("Selective reset for second throw");
+
+      resetPinsSelective();
+
+      const freshPositions = getFreshPositions();
+      let resetCount = 0;
+      let removedCount = 0;
+
+      freshPositions.forEach((position, index) => {
+        const pinRef = pinRefs.current[index];
+        if (pinRef && !pinStates[index]) {
+          resetCount++;
+          console.log(`Resetting standing pin ${index}`);
+          pinRef.setTranslation({
+            x: position[0],
+            y: position[1] + 0.01,
+            z: position[2],
+          });
+          pinRef.setRotation({ x: 0, y: 0, z: 0, w: 1 });
+          pinRef.setLinvel({ x: 0, y: 0, z: 0 });
+          pinRef.setAngvel({ x: 0, y: 0, z: 0 });
+        } else if (pinRef && pinStates[index]) {
+          // Pin tombée on l'enlève
+          removedCount++;
+          console.log(`Removing fallen pin ${index}`);
+          pinRef.setTranslation({
+            x: position[0] + (Math.random() - 0.5) * 2,
+            y: -5,
+            z: position[2] + 3,
+          });
+          pinRef.setLinvel({ x: 0, y: 0, z: 0 });
+          pinRef.setAngvel({ x: 0, y: 0, z: 0 });
+        }
+      });
+
+      console.log(
+        `Selective reset complete: ${resetCount} standing pins reset, ${removedCount} fallen pins removed`
+      );
+    }
   };
 
   useEffect(() => {
@@ -164,9 +231,53 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
     [sounds, allSoundsLoaded]
   );
 
-  // Add reset button to controls
+  const gameInfo = getGameInfo();
+
+  // Listen for game state changes to auto-reset pins
+  useEffect(() => {
+    console.log("Pin reset effect triggered:", {
+      gamePhase: gameInfo.gamePhase,
+      currentFrame: gameInfo.currentFrame,
+      currentThrow: gameInfo.currentThrow,
+      needsFullReset: gameInfo.needsFullReset,
+    });
+
+    // Auto-reset pins when starting a new frame, after strikes/spares, or for second throws
+    if (gameInfo.gamePhase === "playing") {
+      if (gameInfo.needsFullReset) {
+        console.log("Triggering full reset (new frame/strike/spare)");
+        setTimeout(() => {
+          resetPinsIntelligent();
+        }, 100);
+      } else if (gameInfo.currentThrow === 1) {
+        console.log("Triggering selective reset (second throw)");
+        setTimeout(() => {
+          resetPinsIntelligent();
+        }, 100);
+      }
+    }
+  }, [gameInfo.gamePhase, gameInfo.currentFrame, gameInfo.currentThrow]);
+
+  // Du debug dans leva
   useControls("Pins Actions", {
-    "Reset Pins": button(resetPins),
+    "Reset All Pins": button(resetPins),
+    "Smart Reset": button(resetPinsIntelligent),
+    "Force Full Reset": button(() => {
+      console.log("Force Full Reset triggered");
+      resetPinCount();
+      resetPins();
+    }),
+    "Debug State": button(() => {
+      const info = getGameInfo();
+      console.log("Pin Debug State:", {
+        gamePhase: info.gamePhase,
+        currentFrame: info.currentFrame,
+        currentThrow: info.currentThrow,
+        needsFullReset: info.needsFullReset,
+        pinStates: pinStates,
+        pinsDown: info.frames[info.currentFrame]?.throws,
+      });
+    }),
   });
 
   return (

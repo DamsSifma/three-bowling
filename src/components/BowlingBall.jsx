@@ -1,12 +1,11 @@
 import { useControls } from "leva";
 import { RigidBody } from "@react-three/rapier";
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGameState } from "../hooks/useGameState";
 
 export const BowlingBall = ({ position = [0, 1, -5] }) => {
   const ballRef = useRef();
-  const [isRolling, setIsRolling] = useState(false);
 
   const ballRadius = 0.11;
 
@@ -21,7 +20,7 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       ballMass: { value: 25, min: 5, max: 30, step: 1 },
     });
 
-  const { setIsRolling: setIsRollingGlobal, setBallRef } = useGameState();
+  const { setIsRolling, setBallRef, isRolling } = useGameState();
 
   const resetBall = useCallback(() => {
     if (ballRef.current) {
@@ -33,14 +32,12 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       ballRef.current.setLinvel({ x: 0, y: 0, z: 0 });
       ballRef.current.setAngvel({ x: 0, y: 0, z: 0 });
       setIsRolling(false);
-      setIsRollingGlobal(false);
     }
-  }, [position, setIsRollingGlobal]);
+  }, [position, setIsRolling]);
 
   const throwBall = useCallback(() => {
     if (ballRef.current && !isRolling) {
       setIsRolling(true);
-      setIsRollingGlobal(true);
 
       // Apply linear velocity
       ballRef.current.setLinvel({
@@ -56,7 +53,7 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       //   z: 0,
       // });
     }
-  }, [power, aimX, spinX, spinY, isRolling, setIsRollingGlobal]);
+  }, [power, aimX, spinX, spinY, isRolling, setIsRolling]);
 
   useEffect(() => {
     setBallRef({
@@ -65,14 +62,34 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
     });
   }, [throwBall, resetBall, setBallRef]);
 
-  // Auto reset si la balle va trop loin
-  useFrame(() => {
+  // Check état boule et reset auto
+  const lastVelocityCheck = useRef(0);
+
+  useFrame((state) => {
     if (ballRef.current) {
       const pos = ballRef.current.translation();
       const vel = ballRef.current.linvel();
 
+      // Check si boule OOB
       if (pos.z > 8 || pos.y < -1 || Math.abs(pos.x) > 2 || pos.y > 5) {
         setTimeout(resetBall, 1000);
+        return;
+      }
+
+      // Check pour savoir si la boule s'est arrêtée (throttled to prevent spam)
+      if (
+        isRolling &&
+        state.clock.elapsedTime - lastVelocityCheck.current > 0.2
+      ) {
+        const velocity = Math.sqrt(
+          vel.x * vel.x + vel.y * vel.y + vel.z * vel.z
+        );
+        const isMoving = velocity > 0.1;
+
+        if (!isMoving) {
+          setIsRolling(false);
+        }
+        lastVelocityCheck.current = state.clock.elapsedTime;
       }
     }
   });

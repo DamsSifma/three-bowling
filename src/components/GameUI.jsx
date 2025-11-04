@@ -1,91 +1,122 @@
 import { useGameState } from "../hooks/useGameState";
+import Scoreboard from "./Scoreboard";
 
 export const GameUI = ({ onBackToMenu }) => {
-  const { ballsThrown, isRolling, throwBall, resetBall, pinsDown, pinStates } =
-    useGameState();
+  const {
+    isRolling,
+    throwBall,
+    resetBall,
+    pinsDown,
+    gamePhase,
+    getGameInfo,
+    nextFrame,
+    recordThrow,
+  } = useGameState();
+
+  const gameInfo = getGameInfo();
+
+  const canThrow = gamePhase === "playing" && !isRolling;
+  const showNextFrame = gamePhase === "frameComplete";
+
+  const getStatusMessage = () => {
+    if (gamePhase === "gameComplete") return "🎉 Game Complete!";
+    if (gamePhase === "frameComplete") {
+      const lastResult = gameInfo.lastThrowResult;
+      if (lastResult?.isStrike) return "🎯 STRIKE!";
+      if (lastResult?.isSpare) return "🎳 SPARE!";
+      return "Frame Complete";
+    }
+    if (gamePhase === "playing") {
+      const { currentFrame, currentThrow } = gameInfo;
+      const throwNumber = currentThrow === 0 ? "1st" : "2nd";
+      return `Frame ${currentFrame + 1} - ${throwNumber} throw`;
+    }
+    return "Ready to play";
+  };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "20px",
-        left: "20px",
-        background: "rgba(0, 0, 0, 0.9)",
-        color: "white",
-        padding: "20px",
-        borderRadius: "10px",
-        fontSize: "14px",
-        minWidth: "200px",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
-        zIndex: 1000,
-      }}
-    >
-      <div style={{ marginBottom: "15px" }}>
-        <h3 style={{ margin: "0 0 10px 0", fontSize: "16px" }}>
-          🎳 Bowling Game
-        </h3>
-        <div>
-          Balls thrown: <strong>{ballsThrown}</strong>
-        </div>
-        <div>
-          Pins down: <strong>{pinsDown}/10</strong>
-        </div>
-        {pinsDown === 10 && (
-          <div style={{ color: "#4CAF50", fontWeight: "bold" }}>🎉 STRIKE!</div>
-        )}
+    <>
+      {/* Scoreboard */}
+      <div className="scoreboard-wrapper">
+        <Scoreboard gameInfo={gameInfo} />
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-        <button
-          onClick={throwBall}
-          style={{
-            padding: "12px 20px",
-            backgroundColor: isRolling ? "#555" : "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: isRolling ? "not-allowed" : "pointer",
-            fontSize: "14px",
-            fontWeight: "bold",
-            transition: "background-color 0.2s",
-          }}
-          disabled={isRolling}
-        >
-          {isRolling ? "🎳 Rolling..." : "🚀 THROW"}
-        </button>
+      {/* Game Controls */}
+      <div className="game-controls">
+        <div className="game-info">
+          <h3 className="game-title">🎳 Bowling Game</h3>
 
-        <button
-          onClick={resetBall}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#f44336",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "12px",
-            transition: "background-color 0.2s",
-          }}
-        >
-          🔄 Reset Ball
-        </button>
+          <div className="game-status-message">
+            <strong>{getStatusMessage()}</strong>
+          </div>
 
-        <button
-          onClick={onBackToMenu}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#9C27B0",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "11px",
-            transition: "background-color 0.2s",
-          }}
-        >
-          🏠 MENU
-        </button>
+          <div className="pins-status">
+            Pins down:{" "}
+            <strong>
+              {pinsDown}/{gameInfo.remainingPins}
+            </strong>
+          </div>
+
+          {gameInfo.lastThrowResult?.isStrike && (
+            <div className="strike-notification">🎯 STRIKE!</div>
+          )}
+
+          {gameInfo.lastThrowResult?.isSpare && (
+            <div className="spare-notification">🎳 SPARE!</div>
+          )}
+        </div>
+
+        <div className="button-container">
+          <button
+            onClick={throwBall}
+            className={`game-button throw-button ${
+              canThrow ? "enabled" : "disabled"
+            }`}
+            disabled={!canThrow}
+          >
+            {isRolling ? "🎳 Rolling..." : "🚀 THROW"}
+          </button>
+
+          {showNextFrame && (
+            <button
+              onClick={nextFrame}
+              className="game-button next-frame-button"
+            >
+              ▶️ Next Frame
+            </button>
+          )}
+
+          <button onClick={resetBall} className="game-button reset-button">
+            🔄 Reset Ball
+          </button>
+
+          {/* Debug/Manual controls */}
+          <button onClick={recordThrow} className="game-button debug-button">
+            📝 Record Throw
+          </button>
+
+          <button
+            onClick={() => {
+              console.log("Debug Game State Button Clicked");
+              const info = getGameInfo();
+              console.log("Current Game State:", {
+                gamePhase: info.gamePhase,
+                currentFrame: info.currentFrame,
+                currentThrow: info.currentThrow,
+                pinsDown,
+                isRolling,
+              });
+            }}
+            className="game-button debug-button"
+          >
+            🐛 Debug State
+          </button>
+
+          <button onClick={onBackToMenu} className="game-button menu-button">
+            🏠 MENU
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
