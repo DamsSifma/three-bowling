@@ -11,8 +11,10 @@ function App() {
   const [appState, setAppState] = useState("menu");
   const { startGame } = useGameState();
 
-  const { backgroundColor } = useControls("Colors", {
+  const { backgroundColor, showPerf, showGraph } = useControls("Debug", {
     backgroundColor: { value: "#1e1e1e" },
+    showPerf: false,
+    showGraph: false,
   });
 
   const handleStartGame = () => {
@@ -27,11 +29,10 @@ function App() {
   return (
     <>
       <Leva theme={{ sizes: { rootWidth: "350px" } }} />
-
       {appState === "playing" && (
         <>
           <Canvas shadows camera={{ position: [0, 4, -2], fov: 60 }}>
-            <Perf showGraph={false} position="top-left" />
+            {showPerf && <Perf showGraph={showGraph} position="top-left" />}
             <color attach="background" args={[backgroundColor]} />
             <Experience />
           </Canvas>
