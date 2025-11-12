@@ -67,16 +67,6 @@ export const GameUI = ({ onBackToMenu }) => {
         </div>
 
         <div className="button-container">
-          <button
-            onClick={throwBall}
-            className={`game-button throw-button ${
-              canThrow ? "enabled" : "disabled"
-            }`}
-            disabled={!canThrow}
-          >
-            {isRolling ? "🎳 Rolling..." : "🚀 THROW"}
-          </button>
-
           {showNextFrame && (
             <button
               onClick={nextFrame}

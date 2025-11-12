@@ -11,21 +11,17 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
 
   const [ballPosition, setBallPosition] = useState({ x: 0, y: 0.11, z: -5 });
   const [throwAngle, setThrowAngle] = useState(0);
-  const [controlPhase, setControlPhase] = useState("positioning"); // 'positioning', 'aiming', 'ready'
 
   const ballRadius = 0.11;
 
-  const { restitution, friction, ballMass, power } = useControls(
-    "Ball Physics",
-    {
-      power: { value: 15, min: 1, max: 25, step: 0.5 },
-      restitution: { value: 0.75, min: 0, max: 1, step: 0.05 },
-      friction: { value: 0.2, min: 0, max: 2, step: 0.1 },
-      ballMass: { value: 25, min: 5, max: 30, step: 1 },
-    }
-  );
+  const { restitution, friction, ballMass } = useControls("Ball Physics", {
+    restitution: { value: 0.75, min: 0, max: 1, step: 0.05 },
+    friction: { value: 0.2, min: 0, max: 2, step: 0.1 },
+    ballMass: { value: 25, min: 5, max: 30, step: 1 },
+  });
 
-  const { setIsRolling, setBallRef, isRolling } = useGameState();
+  const { setIsRolling, setBallRef, isRolling, controlPhase, setControlPhase } =
+    useGameState();
 
   const handleMouseMove = useCallback(
     (event) => {
@@ -51,8 +47,7 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
     if (controlPhase === "positioning") {
       setControlPhase("aiming");
     } else if (controlPhase === "aiming") {
-      setControlPhase("ready");
-      throwBall();
+      setControlPhase("power");
     }
   }, [isRolling, controlPhase]);
 
@@ -75,23 +70,27 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
     }
   }, [setIsRolling]);
 
+  const [selectedPower, setSelectedPower] = useState(15);
+
   const throwBall = useCallback(() => {
-    if (ballRef.current && !isRolling && controlPhase === "ready") {
+    if (ballRef.current && !isRolling && controlPhase === "power") {
       setIsRolling(true);
+      setControlPhase("ready");
 
       const angleRad = (throwAngle * Math.PI) / 180;
       ballRef.current.setLinvel({
-        x: Math.sin(angleRad) * power * 0.1,
+        x: Math.sin(angleRad) * selectedPower * 0.1,
         y: 0,
-        z: power,
+        z: selectedPower,
       });
     }
-  }, [throwAngle, power, isRolling, controlPhase, setIsRolling]);
+  }, [throwAngle, selectedPower, isRolling, controlPhase, setIsRolling]);
 
   useEffect(() => {
     setBallRef({
       throwBall,
       resetBall,
+      setPower: (p) => setSelectedPower(p),
     });
   }, [throwBall, resetBall, setBallRef]);
 
@@ -179,7 +178,7 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
         show={true}
         ballPosition={ballPosition}
         throwAngle={throwAngle}
-        power={power}
+        power={15}
         isRolling={isRolling}
         controlPhase={controlPhase}
       />

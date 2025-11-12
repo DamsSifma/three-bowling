@@ -5,6 +5,7 @@ import { Leva, useControls } from "leva";
 import { Perf } from "r3f-perf";
 import { GameUI } from "./components/GameUI";
 import { MainMenu } from "./components/MainMenu";
+import { PowerMeter } from "./components/PowerMeter";
 import { useGameState } from "./hooks/useGameState";
 
 function App() {
@@ -28,7 +29,7 @@ function App() {
 
   return (
     <>
-      <Leva theme={{ sizes: { rootWidth: "350px" } }} />
+      <Leva collapsed theme={{ sizes: { rootWidth: "350px" } }} />
       {appState === "playing" && (
         <>
           <Canvas shadows camera={{ position: [0, 4, -2], fov: 60 }}>
@@ -37,6 +38,7 @@ function App() {
             <Experience />
           </Canvas>
           <GameUI onBackToMenu={handleBackToMenu} />
+          <PowerMeter />
         </>
       )}
 

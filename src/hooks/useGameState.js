@@ -13,6 +13,7 @@ let gameState = {
   pinOutOfBounds: Array(10).fill(false),
   bowlingGame: new BowlingGame(),
   gamePhase: "menu",
+  controlPhase: "positioning",
   autoProgression: true,
   lastThrowResult: null,
   gameController: null,
@@ -246,6 +247,11 @@ export const useGameState = () => {
 
   const nextFrame = nextFrameInternal;
 
+  const setControlPhase = (phase) => {
+    gameState.controlPhase = phase;
+    notify();
+  };
+
   const setBallRef = (ref) => {
     gameState.ballRef = ref;
   };
@@ -334,6 +340,8 @@ export const useGameState = () => {
     resetBall,
     setBallRef,
     setIsRolling,
+    controlPhase: state.controlPhase,
+    setControlPhase,
 
     // Pin control
     setPinRefs,
