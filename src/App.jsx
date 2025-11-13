@@ -11,6 +11,7 @@ import { useGameState } from "./hooks/useGameState";
 function App() {
   const [appState, setAppState] = useState("menu");
   const { startGame } = useGameState();
+  const isDev = process.env.NODE_ENV !== "production";
 
   const { backgroundColor, showPerf, showGraph } = useControls("Debug", {
     backgroundColor: { value: "#1e1e1e" },
@@ -29,7 +30,11 @@ function App() {
 
   return (
     <>
-      <Leva collapsed theme={{ sizes: { rootWidth: "350px" } }} />
+      <Leva
+        collapsed
+        hidden={!isDev}
+        theme={{ sizes: { rootWidth: "350px" } }}
+      />
       {appState === "playing" && (
         <>
           <Canvas shadows camera={{ position: [0, 4, -2], fov: 60 }}>

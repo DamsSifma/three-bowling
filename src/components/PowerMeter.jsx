@@ -9,7 +9,7 @@ export const PowerMeter = () => {
   const { minPower, maxPower, barSpeed } = useControls("Power Meter", {
     minPower: { value: 5, min: 1, max: 15, step: 1 },
     maxPower: { value: 25, min: 15, max: 50, step: 1 },
-    barSpeed: { value: 0.6, min: 0.1, max: 2, step: 0.1 },
+    barSpeed: { value: 1.2, min: 0.1, max: 2, step: 0.1 },
   });
 
   const showMeter = controlPhase === "power" && !isRolling;
@@ -115,7 +115,7 @@ export const PowerMeter = () => {
         onClick={onLock}
         disabled={!showMeter || locked}
       >
-        {locked ? "🎯 LOCKED" : "🚀 THROW"}
+        {locked ? "🎯 LOCKED" : "🚀 LANCER"}
       </button>
     </div>
   );

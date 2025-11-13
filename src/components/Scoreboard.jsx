@@ -52,7 +52,6 @@ const Scoreboard = ({ gameInfo }) => {
   return (
     <div className="scoreboard">
       <div className="scoreboard-header">
-        <h2>Bowling Score</h2>
         <div className="total-score">
           <span className="score-label">Total:</span>
           <span className="score-value">{totalScore}</span>
@@ -110,13 +109,13 @@ const Scoreboard = ({ gameInfo }) => {
       <div className="game-status">
         {gameComplete && (
           <div className="game-complete">
-            🎳 Game Complete! Final Score: {totalScore}
+            🎳 Partie terminée ! Score final: {totalScore}
           </div>
         )}
         {!gameComplete && (
           <div className="current-frame">
             Frame {currentFrame + 1}{" "}
-            {frames[currentFrame]?.isComplete ? "(Complete)" : "(In Progress)"}
+            {frames[currentFrame]?.isComplete ? "(Terminée)" : "(En cours)"}
           </div>
         )}
       </div>
