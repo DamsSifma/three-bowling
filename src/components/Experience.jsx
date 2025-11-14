@@ -4,11 +4,22 @@ import { BowlingLane } from "./BowlingLane";
 import { BowlingBall } from "./BowlingBall";
 import { BowlingPins } from "./BowlingPins";
 import { useControls } from "leva";
+import { useThree } from "@react-three/fiber";
 
 export const Experience = () => {
-  const { debug } = useControls("Physics", {
+  const { camera } = useThree();
+
+  const { debug } = useControls("Camera & Physics", {
     debug: false,
+    cameraPosition: {
+      value: [0, 2.5, -9],
+      step: 0.1,
+      onChange: (value) => {
+        camera.position.set(...value);
+      },
+    },
   });
+
   return (
     <>
       <OrbitControls makeDefault />
