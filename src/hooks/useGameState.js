@@ -18,6 +18,13 @@ let gameState = {
   lastThrowResult: null,
   gameController: null,
   listeners: new Set(),
+  // Animation state that persists across component remounts
+  animationState: {
+    hasPlayedStrike: false,
+    hasPlayedSpare: false,
+    currentAnimation: null,
+    isAnimating: false,
+  },
 };
 
 const notify = () => {
@@ -167,12 +174,6 @@ export const useGameState = () => {
       const firstThrowPins = currentFrame?.throws[0] || 0;
       const totalPinsNowDown = gameState.pinsDown;
       actualPinsDown = totalPinsNowDown - firstThrowPins;
-
-      // console.log("Second throw calculation:", {
-      //   totalPinsNowDown,
-      //   firstThrowPins,
-      //   actualPinsThisThrow: actualPinsDown,
-      // });
 
       if (actualPinsDown < 0) {
         console.error("Error: Calculated negative pins for second throw");
@@ -328,6 +329,41 @@ export const useGameState = () => {
     }
   };
 
+  // Animation controls - persistent across component remounts
+  const triggerStrikeAnimation = () => {
+    if (!gameState.animationState.hasPlayedStrike) {
+      gameState.animationState.hasPlayedStrike = true;
+      gameState.animationState.currentAnimation = "STRIKE";
+      gameState.animationState.isAnimating = true;
+      notifyListeners();
+
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        gameState.animationState.isAnimating = false;
+        gameState.animationState.currentAnimation = null;
+        notifyListeners();
+        console.log("🕐 3 seconds passed - hiding animation");
+      }, 3000);
+
+      return true;
+    }
+    console.log("❌ Strike animation already played! Reset to play again.");
+    return false;
+  };
+
+  const resetAnimations = () => {
+    gameState.animationState.hasPlayedStrike = false;
+    gameState.animationState.hasPlayedSpare = false;
+    gameState.animationState.currentAnimation = null;
+    gameState.animationState.isAnimating = false;
+    notifyListeners();
+    console.log("🔄 RESETTING animation state");
+  };
+
+  const getAnimationState = () => {
+    return { ...gameState.animationState };
+  };
+
   return {
     ...state,
     // Game control
@@ -351,6 +387,12 @@ export const useGameState = () => {
 
     // Debug
     updateTimingConfig,
+
+    // Animation controls
+    triggerStrikeAnimation,
+    resetAnimations,
+    getAnimationState,
+    animationState: gameState.animationState,
 
     // Manual controls (debug)
     recordThrow,

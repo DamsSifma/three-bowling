@@ -6,13 +6,10 @@ import { Perf } from "r3f-perf";
 import { GameUI } from "./components/GameUI";
 import { MainMenu } from "./components/MainMenu";
 import { PowerMeter } from "./components/PowerMeter";
-import { useGameState } from "./hooks/useGameState";
 
 function App() {
   const [appState, setAppState] = useState("menu");
-  const { startGame } = useGameState();
   const isDev = process.env.NODE_ENV !== "production";
-
   const { backgroundColor, showPerf, showGraph } = useControls("Debug", {
     backgroundColor: { value: "#1e1e1e" },
     showPerf: false,
@@ -20,7 +17,6 @@ function App() {
   });
 
   const handleStartGame = () => {
-    startGame();
     setAppState("playing");
   };
 

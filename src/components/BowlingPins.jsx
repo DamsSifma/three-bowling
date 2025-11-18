@@ -233,7 +233,6 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
 
   const gameInfo = getGameInfo();
 
-  // Listen for game state changes to auto-reset pins
   useEffect(() => {
     console.log("Pin reset effect triggered:", {
       gamePhase: gameInfo.gamePhase,
@@ -242,7 +241,6 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
       needsFullReset: gameInfo.needsFullReset,
     });
 
-    // Auto-reset pins when starting a new frame, after strikes/spares, or for second throws
     if (gameInfo.gamePhase === "playing") {
       if (gameInfo.needsFullReset) {
         console.log("Triggering full reset (new frame/strike/spare)");

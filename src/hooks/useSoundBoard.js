@@ -12,8 +12,20 @@ const useSoundBoard = () => {
     onload: onLoad,
   });
 
+  const [playStrike] = useSound("/sounds/hit.mp3", {
+    volume: 0.7,
+    onload: onLoad,
+  });
+
+  const [playSpare] = useSound("/sounds/hit.mp3", {
+    volume: 0.7,
+    onload: onLoad,
+  });
+
   const sounds = {
     pinHit: playPinHit,
+    strike: playStrike,
+    spare: playSpare,
   };
   const toLoad = Object.keys(sounds).length;
 

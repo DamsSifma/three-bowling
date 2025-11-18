@@ -3,10 +3,10 @@ export class GameController {
     this.gameStateRef = gameStateRef;
     this.timers = new Map();
     this.config = {
-      ballSettleTime: 1500, // Temps pour que la balle se stabilise
-      frameTransitionTime: 2000, // Temps de transition entre les frames
-      ballResetTime: 1000, // Tempo pour réinitialiser la balle
-      pinSettleTime: 500, // Temps que les quilles se stabilisent
+      ballSettleTime: 2000, // Temps pour que la balle se stabilise
+      frameTransitionTime: 1000, // Temps de transition entre les frames
+      ballResetTime: 2000, // Tempo pour réinitialiser la balle
+      pinSettleTime: 2500, // Temps que les quilles se stabilisent
     };
   }
 

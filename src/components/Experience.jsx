@@ -1,8 +1,9 @@
-import { OrbitControls, Environment, Sky } from "@react-three/drei";
+import { OrbitControls, Environment } from "@react-three/drei";
 import { Physics } from "@react-three/rapier";
 import { BowlingLane } from "./BowlingLane";
 import { BowlingBall } from "./BowlingBall";
 import { BowlingPins } from "./BowlingPins";
+import { StrikeSpareAnimation } from "./StrikeSpareAnimation";
 import { useControls } from "leva";
 import { useThree } from "@react-three/fiber";
 
@@ -23,6 +24,8 @@ export const Experience = () => {
   return (
     <>
       <OrbitControls makeDefault />
+
+      <StrikeSpareAnimation />
 
       <ambientLight intensity={0.3} />
       <directionalLight

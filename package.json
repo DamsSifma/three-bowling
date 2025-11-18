@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "@dimforge/rapier3d": "^0.19.0",
+    "@react-spring/three": "^10.0.3",
     "@react-spring/web": "^10.0.3",
     "@react-three/drei": "^10.0.0",
-    "@react-three/fiber": "^9.0.0",
+    "@react-three/fiber": "^9.4.0",
     "@react-three/rapier": "^2.1.0",
     "cannon-es": "^0.20.0",
     "dat.gui": "^0.7.9",

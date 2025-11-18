@@ -1,9 +1,18 @@
+import { useGameState } from "../hooks/useGameState";
+
 export const MainMenu = ({ onStartGame }) => {
+  const { startGame } = useGameState();
+
+  const handleStartGame = () => {
+    startGame();
+    onStartGame();
+  };
+
   return (
     <div className="main-menu">
       <h1 className="main-menu-title">🎳 Three Bowling</h1>
       <div className="buttons">
-        <button onClick={() => onStartGame()} className="button button-primary">
+        <button onClick={handleStartGame} className="button button-primary">
           JOUER
         </button>
         <button onClick={() => {}} className="button button-secondary">
