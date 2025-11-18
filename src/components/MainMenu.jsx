@@ -1,7 +1,10 @@
 import { useGameState } from "../hooks/useGameState";
+import { useState } from "react";
+import { CreditsModal } from "./CreditsModal";
 
 export const MainMenu = ({ onStartGame }) => {
   const { startGame } = useGameState();
+  const [showCredits, setShowCredits] = useState(false);
 
   const handleStartGame = () => {
     startGame();
@@ -15,7 +18,10 @@ export const MainMenu = ({ onStartGame }) => {
         <button onClick={handleStartGame} className="button button-primary">
           JOUER
         </button>
-        <button onClick={() => {}} className="button button-secondary">
+        <button
+          onClick={() => setShowCredits(true)}
+          className="button button-secondary"
+        >
           CRÉDITS
         </button>
       </div>
@@ -37,6 +43,11 @@ export const MainMenu = ({ onStartGame }) => {
           📦 Code source sur GitHub
         </a>
       </div>
+
+      <CreditsModal
+        isOpen={showCredits}
+        onClose={() => setShowCredits(false)}
+      />
     </div>
   );
 };

@@ -109,6 +109,25 @@ body {
   margin: 0;
 }
 
+.credits {
+  opacity: 0.6;
+  margin: 0;
+  font-size: 0.9rem;
+  text-align: center;
+  max-width: 400px;
+}
+
+.credit-link {
+  color: var(--accent);
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.credit-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
 .github-link {
   color: var(--accent);
   text-decoration: none;
@@ -416,6 +435,9 @@ body {
 
   .power-meter-container {
     right: 10px;
+    top: auto;
+    bottom: 10px;
+    transform: none;
     padding: 15px;
   }
   
@@ -423,4 +445,114 @@ body {
     width: 20px;
     height: 150px;
   }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #2d4a59;
+  font-size: 1.5em;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.credit-section {
+  margin-bottom: 24px;
+}
+
+.credit-section:last-child {
+  margin-bottom: 0;
+}
+
+.credit-section h3 {
+  color: #2d4a59;
+  margin: 0 0 12px 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.credit-section p {
+  margin: 0 0 8px 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.credit-section p:last-child {
+  margin-bottom: 0;
+}
+
+.credit-link {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.credit-link:hover {
+  text-decoration: underline;
 }
