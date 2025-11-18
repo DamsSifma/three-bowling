@@ -127,15 +127,7 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
   };
 
   const resetPins = () => {
-    console.log(
-      "Reset pins - current spacing:",
-      spacing,
-      "rowSpacing:",
-      rowSpacing
-    );
-
     const freshPositions = getFreshPositions();
-    console.log("Fresh positions:", freshPositions);
 
     freshPositions.forEach((position, index) => {
       const pinRef = pinRefs.current[index];
@@ -158,21 +150,10 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
     const gameInfo = getGameInfo();
     const needsFullReset = gameInfo.needsFullReset;
 
-    console.log("Smart pin reset called:", {
-      needsFullReset,
-      currentFrame: gameInfo.currentFrame,
-      currentThrow: gameInfo.currentThrow,
-      pinStates,
-      pinsDown: gameInfo.frames[gameInfo.currentFrame]?.throws || [],
-    });
-
     if (needsFullReset) {
-      console.log("Full reset pins");
       resetPinCount();
       resetPins();
     } else {
-      console.log("Selective reset for second throw");
-
       resetPinsSelective();
 
       const freshPositions = getFreshPositions();
@@ -183,7 +164,6 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
         const pinRef = pinRefs.current[index];
         if (pinRef && !pinStates[index]) {
           resetCount++;
-          console.log(`Resetting standing pin ${index}`);
           pinRef.setTranslation({
             x: position[0],
             y: position[1] + 0.01,
@@ -195,7 +175,6 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
         } else if (pinRef && pinStates[index]) {
           // Pin tombée on l'enlève
           removedCount++;
-          console.log(`Removing fallen pin ${index}`);
           pinRef.setTranslation({
             x: position[0] + (Math.random() - 0.5) * 2,
             y: -5,
@@ -205,10 +184,6 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
           pinRef.setAngvel({ x: 0, y: 0, z: 0 });
         }
       });
-
-      console.log(
-        `Selective reset complete: ${resetCount} standing pins reset, ${removedCount} fallen pins removed`
-      );
     }
   };
 
@@ -250,49 +225,18 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
   const gameInfo = getGameInfo();
 
   useEffect(() => {
-    console.log("Pin reset effect triggered:", {
-      gamePhase: gameInfo.gamePhase,
-      currentFrame: gameInfo.currentFrame,
-      currentThrow: gameInfo.currentThrow,
-      needsFullReset: gameInfo.needsFullReset,
-    });
-
     if (gameInfo.gamePhase === "playing") {
       if (gameInfo.needsFullReset) {
-        console.log("Triggering full reset (new frame/strike/spare)");
         setTimeout(() => {
           resetPinsIntelligent();
         }, 100);
       } else if (gameInfo.currentThrow === 1) {
-        console.log("Triggering selective reset (second throw)");
         setTimeout(() => {
           resetPinsIntelligent();
         }, 100);
       }
     }
   }, [gameInfo.gamePhase, gameInfo.currentFrame, gameInfo.currentThrow]);
-
-  // Du debug dans leva
-  useControls("Pins Actions", {
-    "Reset All Pins": button(resetPins),
-    "Smart Reset": button(resetPinsIntelligent),
-    "Force Full Reset": button(() => {
-      console.log("Force Full Reset triggered");
-      resetPinCount();
-      resetPins();
-    }),
-    "Debug State": button(() => {
-      const info = getGameInfo();
-      console.log("Pin Debug State:", {
-        gamePhase: info.gamePhase,
-        currentFrame: info.currentFrame,
-        currentThrow: info.currentThrow,
-        needsFullReset: info.needsFullReset,
-        pinStates: pinStates,
-        pinsDown: info.frames[info.currentFrame]?.throws,
-      });
-    }),
-  });
 
   return (
     <group>

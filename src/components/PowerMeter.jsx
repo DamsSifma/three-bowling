@@ -45,12 +45,6 @@ export const PowerMeter = () => {
     if (!showMeter || locked) return;
     const currentPercent = percent.get();
     const selectedPower = minPower + currentPercent * (maxPower - minPower);
-    console.log(
-      "PowerMeter: Locking power at",
-      selectedPower,
-      "percent:",
-      currentPercent
-    );
     setLocked(true);
     setLockedPower(selectedPower);
     setLockedPercent(currentPercent);

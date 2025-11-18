@@ -17,16 +17,7 @@ export const StrikeSpareAnimation = () => {
   useEffect(() => {
     const gameInfo = getGameInfo();
     if (pinsDown === 10 && lastPinsDown < 10) {
-      const currentFrame = gameInfo.frame;
       const currentThrow = gameInfo.currentThrow;
-
-      console.log("🎳 10 pins down detected!", {
-        currentFrame,
-        currentThrow,
-        pinsDown,
-        lastPinsDown,
-        gamePhase: gameInfo.gamePhase,
-      });
 
       if (currentThrow === 0) {
         setCurrentText("STRIKE");
@@ -65,7 +56,6 @@ export const StrikeSpareAnimation = () => {
   useEffect(() => {
     if (shouldAnimate) {
       const timer = setTimeout(() => {
-        console.log("🕐 3 seconds passed - hiding animation");
         setShouldAnimate(false);
         setCurrentText(null);
       }, 3000);

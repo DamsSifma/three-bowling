@@ -69,7 +69,6 @@ const updatePinCount = () => {
 
     if (isPinOutOfBounds(pinRef)) {
       gameState.pinOutOfBounds[index] = true;
-      console.log(`Pin ${index} fell out of bounds`);
       downCount++;
       return true;
     }
@@ -149,20 +148,6 @@ export const useGameState = () => {
   const recordThrowInternal = () => {
     const currentFrame =
       gameState.bowlingGame.frames[gameState.bowlingGame.currentFrame];
-    console.log("recordThrowInternal called:", {
-      gamePhase: gameState.gamePhase,
-      pinsDown: gameState.pinsDown,
-      currentFrame: gameState.bowlingGame.currentFrame,
-      currentThrow: gameState.bowlingGame.currentThrow,
-      frameThrows: currentFrame?.throws || [],
-      pinStates: gameState.pinStates,
-      validation: {
-        isSecondThrow: gameState.bowlingGame.currentThrow === 1,
-        firstThrowPins: currentFrame?.throws[0] || 0,
-        totalWouldBe: (currentFrame?.throws[0] || 0) + gameState.pinsDown,
-      },
-    });
-
     if (gameState.gamePhase !== "playing") {
       console.log("Cannot record throw - game phase is not 'playing'");
       return;
@@ -185,32 +170,18 @@ export const useGameState = () => {
         actualPinsDown = 10 - firstThrowPins;
       }
     }
-
-    console.log("Recording throw with pins:", actualPinsDown);
     const result = gameState.bowlingGame.recordThrow(actualPinsDown);
-    console.log("Throw recorded with result:", result);
-
     gameState.lastThrowResult = result;
 
     if (result.success) {
       if (result.nextAction === "nextFrame") {
-        console.log("Setting phase to frameComplete");
         gameState.gamePhase = "frameComplete";
       } else if (result.nextAction === "gameComplete") {
-        console.log("Setting phase to gameComplete");
         gameState.gamePhase = "gameComplete";
-      } else {
-        console.log("Staying in playing phase for:", result.nextAction);
       }
 
       if (gameState.gameController && gameState.autoProgression) {
-        console.log("Notifying GameController of throw result");
         gameState.gameController.onThrowRecorded(result);
-      } else {
-        console.log("Not notifying GameController:", {
-          hasController: !!gameState.gameController,
-          autoProgression: gameState.autoProgression,
-        });
       }
     } else {
       console.error("Throw recording failed:", result);
@@ -223,23 +194,9 @@ export const useGameState = () => {
   const recordThrow = recordThrowInternal;
 
   const nextFrameInternal = () => {
-    console.log("nextFrameInternal called - moving to next frame");
-    console.log("Before reset:", {
-      currentFrame: gameState.bowlingGame.currentFrame,
-      pinsDown: gameState.pinsDown,
-      pinStates: gameState.pinStates,
-    });
-
     resetPinCount();
     resetBall();
     gameState.gamePhase = "playing";
-
-    console.log("After reset:", {
-      currentFrame: gameState.bowlingGame.currentFrame,
-      pinsDown: gameState.pinsDown,
-      pinStates: gameState.pinStates,
-      gamePhase: gameState.gamePhase,
-    });
 
     if (gameState.gameController) {
       gameState.gameController.onFrameStart();
@@ -287,7 +244,6 @@ export const useGameState = () => {
   };
 
   const resetPinCount = () => {
-    console.log("resetPinCount called - resetting all pin tracking");
     gameState.pinsDown = 0;
     gameState.pinStates = Array(10).fill(false);
     gameState.pinOutOfBounds = Array(10).fill(false);
@@ -305,10 +261,6 @@ export const useGameState = () => {
         gameState.bowlingGame.frames[gameState.bowlingGame.currentFrame];
       const firstThrowPins = currentFrame?.throws[0] || 0;
 
-      console.log(
-        "Selective pin reset - keeping first throw pins:",
-        firstThrowPins
-      );
       gameState.pinsDown = firstThrowPins;
       resetBall();
     }

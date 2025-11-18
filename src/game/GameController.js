@@ -32,13 +32,10 @@ export class GameController {
   }
 
   onBallStopped() {
-    console.log("GameController: Ball stopped, starting auto-progression");
-
     // On attend que les quilles se stabilisent avant d'enregistrer le lancer
     this.setTimer(
       "recordThrow",
       () => {
-        console.log("GameController: Recording throw");
         const gameState = this.gameStateRef.current;
         if (gameState && gameState.recordThrow) {
           gameState.recordThrow();
@@ -49,20 +46,22 @@ export class GameController {
   }
 
   onThrowRecorded(result) {
-    console.log("GameController: Throw recorded with result:", result);
-
     if (!result.success) {
       console.log("GameController: Throw was not successful, stopping");
       return;
     }
 
     if (result.nextAction === "secondThrow") {
+      setTimeout(() => {
+        const gameState = this.gameStateRef.current;
+        if (gameState && gameState.resetBall) {
+          gameState.resetBall();
+        }
+      }, this.config.ballSettleDelay);
     } else if (result.nextAction === "nextFrame") {
-      console.log("GameController: Setting timer for next frame transition");
       this.setTimer(
         "nextFrame",
         () => {
-          console.log("GameController: Moving to next frame");
           const gameState = this.gameStateRef.current;
           if (gameState && gameState.nextFrame) {
             gameState.nextFrame();
@@ -73,13 +72,19 @@ export class GameController {
     } else if (result.nextAction === "gameComplete") {
       console.log("GameController: Game completed!");
       this.clearAllTimers();
+    } else if (result.nextAction === "continue") {
+      setTimeout(() => {
+        const gameState = this.gameStateRef.current;
+        if (gameState && gameState.resetBall) {
+          gameState.resetBall();
+        }
+      }, this.config.ballSettleDelay);
     } else {
       console.log("GameController: Unknown nextAction:", result.nextAction);
     }
   }
 
   onFrameStart() {
-    console.log("GameController: Frame started, resetting timers");
     this.clearAllTimers();
   }
 

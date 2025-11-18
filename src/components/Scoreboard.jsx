@@ -68,40 +68,21 @@ const Scoreboard = ({ gameInfo }) => {
           >
             <div className="frame-number">{index + 1}</div>
 
-            {index < 9 ? (
-              // Frames 1-9
-              <div className="throws">
-                <div className="throw-boxes">
-                  <div className="throw-box first">
-                    {frame.isStrike
-                      ? "X"
-                      : formatThrow(frame.throws[0], 0, frame)}
-                  </div>
-                  <div className="throw-box second">
-                    {frame.isStrike
-                      ? ""
-                      : formatThrow(frame.throws[1], 1, frame)}
-                  </div>
+            <div className="throws">
+              <div className="throw-boxes">
+                <div className="throw-box first">
+                  {frame.isStrike
+                    ? "X"
+                    : formatThrow(frame.throws[0], 0, frame)}
                 </div>
-                <div className="frame-score">
-                  {frame.score !== null ? frame.score : ""}
+                <div className="throw-box second">
+                  {frame.isStrike ? "" : formatThrow(frame.throws[1], 1, frame)}
                 </div>
               </div>
-            ) : (
-              // Frame 10
-              <div className="throws tenth-frame">
-                <div className="throw-boxes">
-                  {formatFrame10(frame).map((throwStr, throwIndex) => (
-                    <div key={throwIndex} className="throw-box">
-                      {throwStr}
-                    </div>
-                  ))}
-                </div>
-                <div className="frame-score">
-                  {frame.score !== null ? frame.score : ""}
-                </div>
+              <div className="frame-score">
+                {frame.score !== null ? frame.score : ""}
               </div>
-            )}
+            </div>
           </div>
         ))}
       </div>

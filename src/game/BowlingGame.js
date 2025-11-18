@@ -46,29 +46,21 @@ export class BowlingGame {
 
     const frame = this.frames[this.currentFrame];
 
-    // Validate throw
-    if (this.currentFrame < 9) {
-      // Frames 1-9
-      if (this.currentThrow === 0 && (pinsDown < 0 || pinsDown > 10)) {
-        return {
-          success: false,
-          message: "Invalid pins count for first throw",
-        };
-      }
-      if (
-        this.currentThrow === 1 &&
-        (pinsDown < 0 || frame.throws[0] + pinsDown > 10)
-      ) {
-        return {
-          success: false,
-          message: "Invalid pins count for second throw",
-        };
-      }
-    } else {
-      // Frame 10: Special rules
-      if (pinsDown < 0 || pinsDown > 10) {
-        return { success: false, message: "Invalid pins count" };
-      }
+    // Validate throw - same rules for all frames
+    if (this.currentThrow === 0 && (pinsDown < 0 || pinsDown > 10)) {
+      return {
+        success: false,
+        message: "Invalid pins count for first throw",
+      };
+    }
+    if (
+      this.currentThrow === 1 &&
+      (pinsDown < 0 || frame.throws[0] + pinsDown > 10)
+    ) {
+      return {
+        success: false,
+        message: "Invalid pins count for second throw",
+      };
     }
 
     frame.throws.push(pinsDown);
@@ -90,45 +82,31 @@ export class BowlingGame {
         isFrameComplete = true;
         nextAction = "nextFrame";
       } else {
-        // pas strike
+        // Not strike
         this.currentThrow = 1;
         nextAction = "secondThrow";
       }
     } else {
-      // Logique spéciale pour la 10ème frame
-      const totalThrows = frame.throws.length;
-
-      if (totalThrows === 1 && pinsDown === 10) {
-        // Strike premier lancer
+      if (this.currentThrow === 0 && pinsDown === 10) {
         frame.isStrike = true;
-        nextAction = "continue"; // Lancers bonus
-      } else if (totalThrows === 2) {
-        if (
-          frame.throws[0] === 10 ||
-          frame.throws[0] + frame.throws[1] === 10
-        ) {
-          // Strike ou spare au deuxième lancer
-          if (
-            frame.throws[0] + frame.throws[1] === 10 &&
-            frame.throws[0] !== 10
-          ) {
-            frame.isSpare = true;
-          }
-          nextAction = "continue"; // troisème lancer
-        } else {
-          // Pas de strike ou spare, frame complète
-          frame.isComplete = true;
-          isFrameComplete = true;
-          nextAction = "gameComplete";
-        }
-      } else if (totalThrows === 3) {
-        // Troisième lancer en 10ème frame, jeu terminé
         frame.isComplete = true;
         isFrameComplete = true;
         nextAction = "gameComplete";
+      } else if (this.currentThrow === 1) {
+        if (frame.throws[0] + pinsDown === 10) {
+          frame.isSpare = true;
+        }
+        frame.isComplete = true;
+        isFrameComplete = true;
+        nextAction = "gameComplete";
+      } else {
+        // Not strike
+        this.currentThrow = 1;
+        nextAction = "secondThrow";
       }
     }
 
+    // Normal frame advancement
     if (isFrameComplete && this.currentFrame < 9) {
       this.currentFrame++;
       this.currentThrow = 0;
@@ -140,13 +118,17 @@ export class BowlingGame {
 
     this.calculateScores();
 
+    const strikeThisThrow = this.currentThrow === 0 && pinsDown === 10;
+    const spareThisThrow =
+      this.currentThrow === 1 && frame.throws[0] + pinsDown === 10;
+
     return {
       success: true,
       currentFrame: this.currentFrame,
       currentThrow: nextAction === "secondThrow" ? 1 : 0,
       isFrameComplete,
-      isStrike: frame.isStrike,
-      isSpare: frame.isSpare,
+      isStrike: strikeThisThrow,
+      isSpare: spareThisThrow,
       nextAction,
       totalScore: this.totalScore,
       gameComplete: this.gameComplete,
@@ -168,36 +150,31 @@ export class BowlingGame {
 
       let frameScore = 0;
 
-      if (i < 9) {
-        if (frame.isStrike) {
-          frameScore = 10;
-          // Add bonus from next two throws
-          if (i + 1 < 10 && this.frames[i + 1].throws.length > 0) {
-            frameScore += this.frames[i + 1].throws[0];
-            if (
-              this.frames[i + 1].isStrike &&
-              i + 2 < 10 &&
-              this.frames[i + 2].throws.length > 0
-            ) {
-              // Next frame is also a strike, get first throw from frame after that
-              frameScore += this.frames[i + 2].throws[0];
-            } else if (this.frames[i + 1].throws.length > 1) {
-              // Next frame has second throw
-              frameScore += this.frames[i + 1].throws[1];
-            }
+      if (frame.isStrike) {
+        frameScore = 10;
+        // Add bonus from next two throws
+        if (i + 1 < 10 && this.frames[i + 1].throws.length > 0) {
+          frameScore += this.frames[i + 1].throws[0];
+          if (
+            this.frames[i + 1].isStrike &&
+            i + 2 < 10 &&
+            this.frames[i + 2].throws.length > 0
+          ) {
+            // Next frame is also a strike, get first throw from frame after that
+            frameScore += this.frames[i + 2].throws[0];
+          } else if (this.frames[i + 1].throws.length > 1) {
+            // Next frame has second throw
+            frameScore += this.frames[i + 1].throws[1];
           }
-        } else if (frame.isSpare) {
-          frameScore = 10;
-          // Add bonus from next throw
-          if (i + 1 < 10 && this.frames[i + 1].throws.length > 0) {
-            frameScore += this.frames[i + 1].throws[0];
-          }
-        } else {
-          // Open frame
-          frameScore = frame.throws.reduce((sum, pins) => sum + pins, 0);
+        }
+      } else if (frame.isSpare) {
+        frameScore = 10;
+        // Add bonus from next throw
+        if (i + 1 < 10 && this.frames[i + 1].throws.length > 0) {
+          frameScore += this.frames[i + 1].throws[0];
         }
       } else {
-        // Frame 10: Just sum all throws
+        // Open frame
         frameScore = frame.throws.reduce((sum, pins) => sum + pins, 0);
       }
 
@@ -224,42 +201,13 @@ export class BowlingGame {
 
     const frame = this.frames[this.currentFrame];
 
-    if (this.currentFrame < 9) {
-      // Frames 1-9
-      if (this.currentThrow === 0) return 10;
-      return 10 - frame.throws[0];
-    } else {
-      // Frame 10
-      const throwCount = frame.throws.length;
-      if (throwCount === 0) return 10;
-      if (throwCount === 1) {
-        return frame.throws[0] === 10 ? 10 : 10 - frame.throws[0];
-      }
-      if (throwCount === 2) {
-        if (frame.throws[0] === 10) return 10; // Strike
-        if (frame.throws[0] + frame.throws[1] === 10) return 10; // Spare
-        return 0;
-      }
-      return 0;
-    }
+    if (this.currentThrow === 0) return 10;
+    return 10 - frame.throws[0];
   }
 
   needsFullPinReset() {
     if (this.gameComplete) return true;
 
-    const frame = this.frames[this.currentFrame];
-
-    if (this.currentFrame < 9) {
-      // Frames 1-9
-      return this.currentThrow === 0;
-    } else {
-      // Frame 10
-      const throwCount = frame.throws.length;
-      if (throwCount === 0) return true;
-      if (throwCount === 1 && frame.throws[0] === 10) return true; // After strike
-      if (throwCount === 2 && frame.throws[0] + frame.throws[1] === 10)
-        return true; // After spare
-      return false;
-    }
+    return this.currentThrow === 0;
   }
 }
