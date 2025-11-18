@@ -57,20 +57,6 @@ export class GameController {
     }
 
     if (result.nextAction === "secondThrow") {
-      console.log(
-        "GameController: Setting timer for ball reset (second throw)"
-      );
-      this.setTimer(
-        "ballReset",
-        () => {
-          console.log("GameController: Resetting ball for second throw");
-          const gameState = this.gameStateRef.current;
-          if (gameState && gameState.resetBall) {
-            gameState.resetBall();
-          }
-        },
-        this.config.ballResetTime
-      );
     } else if (result.nextAction === "nextFrame") {
       console.log("GameController: Setting timer for next frame transition");
       this.setTimer(

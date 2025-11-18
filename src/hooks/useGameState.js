@@ -298,6 +298,7 @@ export const useGameState = () => {
 
     if (needsFullReset) {
       resetPinCount();
+      resetBall();
     } else {
       const currentFrame =
         gameState.bowlingGame.frames[gameState.bowlingGame.currentFrame];
@@ -308,6 +309,7 @@ export const useGameState = () => {
         firstThrowPins
       );
       gameState.pinsDown = firstThrowPins;
+      resetBall();
     }
 
     notify();

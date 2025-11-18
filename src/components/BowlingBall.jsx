@@ -57,7 +57,7 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       const resetPosition = { x: 0, y: 0.11, z: -5 };
       setBallPosition(resetPosition);
       setThrowAngle(0);
-      setControlPhase("positioning");
+      setControlPhase("positioning"); // Always reset control phase when explicitly reset
 
       ballRef.current.setTranslation({
         x: resetPosition.x,
@@ -68,7 +68,7 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
       ballRef.current.setAngvel({ x: 0, y: 0, z: 0 });
       setIsRolling(false);
     }
-  }, [setIsRolling]);
+  }, [setIsRolling, setControlPhase]);
 
   const [selectedPower, setSelectedPower] = useState(15);
 
@@ -126,8 +126,8 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
 
       // Check si boule OOB
       if (pos.z > 8 || pos.y < -1 || Math.abs(pos.x) > 2 || pos.y > 5) {
-        setTimeout(resetBall, 1000);
-        return;
+        ballRef.current.setLinvel({ x: 0, y: 0, z: 0 });
+        ballRef.current.setAngvel({ x: 0, y: 0, z: 0 });
       }
 
       // Check pour savoir si la boule s'est arrêtée (throttled to prevent spam)
@@ -142,7 +142,8 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
 
         if (!isMoving) {
           setIsRolling(false);
-          setControlPhase("positioning");
+          // Don't automatically reset control phase - let game logic handle it
+          console.log("🎳 Ball stopped - waiting for game logic to reset");
         }
         lastVelocityCheck.current = state.clock.elapsedTime;
       }
