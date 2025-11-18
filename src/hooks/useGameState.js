@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Euler, Quaternion } from "three";
+import { Euler, Quaternion, Vector3 } from "three";
 import { BowlingGame } from "../game/BowlingGame.js";
 import { GameController } from "../game/GameController.js";
 
@@ -41,10 +41,11 @@ const isPinDown = (pinRef) => {
     rotation.z,
     rotation.w
   );
-  const euler = new Euler().setFromQuaternion(quaternion);
-  const tiltThreshold = Math.PI / 6; // 30 degrès
-  const isDown =
-    Math.abs(euler.x) > tiltThreshold || Math.abs(euler.z) > tiltThreshold;
+
+  const upVector = new Vector3(0, 1, 0);
+  upVector.applyQuaternion(quaternion);
+  // On calcul l'angle du vecteur up par rapport à l'axe Y
+  const isDown = upVector.y < 0.86; // cos(30°) ≈ 0.86
 
   return isDown;
 };

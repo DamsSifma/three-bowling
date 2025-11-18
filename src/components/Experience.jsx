@@ -1,4 +1,4 @@
-import { OrbitControls, Environment } from "@react-three/drei";
+import { Environment } from "@react-three/drei";
 import { Physics } from "@react-three/rapier";
 import { BowlingLane } from "./BowlingLane";
 import { BowlingBall } from "./BowlingBall";
@@ -17,14 +17,13 @@ export const Experience = () => {
       step: 0.1,
       onChange: (value) => {
         camera.position.set(...value);
+        camera.lookAt(0, 0, 0);
       },
     },
   });
 
   return (
     <>
-      <OrbitControls makeDefault />
-
       <StrikeSpareAnimation />
 
       <ambientLight intensity={0.3} />

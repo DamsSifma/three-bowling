@@ -48,6 +48,7 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
     getGameInfo,
   } = useGameState();
   const lastCheckTime = useRef(0);
+  const ballStoppedTime = useRef(null);
 
   const {
     spacing,
@@ -216,7 +217,22 @@ export const BowlingPins = ({ basePosition = [0, 0, 4] }) => {
   }, [setPinRefs]);
 
   useFrame((state) => {
-    if (isRolling && state.clock.elapsedTime - lastCheckTime.current > 0.2) {
+    if (!isRolling && ballStoppedTime.current === null) {
+      ballStoppedTime.current = state.clock.elapsedTime;
+    }
+    if (isRolling) {
+      ballStoppedTime.current = null;
+    }
+    // Check pins while ball is rolling OR for 2 seconds after ball stops
+    const timeSinceBallStopped = ballStoppedTime.current
+      ? state.clock.elapsedTime - ballStoppedTime.current
+      : 0;
+    const shouldCheckPins = isRolling || timeSinceBallStopped < 2.0;
+
+    if (
+      shouldCheckPins &&
+      state.clock.elapsedTime - lastCheckTime.current > 0.2
+    ) {
       checkPins();
       lastCheckTime.current = state.clock.elapsedTime;
     }

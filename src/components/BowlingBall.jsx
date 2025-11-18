@@ -130,7 +130,7 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
         ballRef.current.setAngvel({ x: 0, y: 0, z: 0 });
       }
 
-      // Check pour savoir si la boule s'est arrêtée (throttled to prevent spam)
+      // Check pour savoir si la boule s'est arrêtée
       if (
         isRolling &&
         state.clock.elapsedTime - lastVelocityCheck.current > 0.2
@@ -142,8 +142,6 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
 
         if (!isMoving) {
           setIsRolling(false);
-          // Don't automatically reset control phase - let game logic handle it
-          console.log("🎳 Ball stopped - waiting for game logic to reset");
         }
         lastVelocityCheck.current = state.clock.elapsedTime;
       }
