@@ -23,33 +23,54 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
   const { setIsRolling, setBallRef, isRolling, controlPhase, setControlPhase } =
     useGameState();
 
-  const handleMouseMove = useCallback(
+  const getPointerPosition = useCallback(
+    (event) => {
+      const rect = gl.domElement.getBoundingClientRect();
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      return ((clientX - rect.left) / rect.width) * 2 - 1; // -1 à 1
+    },
+    [gl.domElement]
+  );
+
+  const handlePointerMove = useCallback(
     (event) => {
       if (isRolling) return;
 
-      const rect = gl.domElement.getBoundingClientRect();
-      const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1; // -1 à 1
+      const pointerX = getPointerPosition(event);
 
       if (controlPhase === "positioning") {
-        const newX = -mouseX * 0.8;
+        const newX = -pointerX * 0.8;
         setBallPosition((prev) => ({ ...prev, x: newX }));
       } else if (controlPhase === "aiming") {
-        const newAngle = -mouseX * 60; // -60 à 60 degrès
+        const newAngle = -pointerX * 60; // -60 à 60 degrès
         setThrowAngle(newAngle);
       }
     },
-    [isRolling, controlPhase, gl.domElement]
+    [isRolling, controlPhase, getPointerPosition]
   );
 
-  const handleMouseClick = useCallback(() => {
-    if (isRolling) return;
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handlePointerDown = useCallback(
+    (event) => {
+      if (isRolling) return;
+      setIsDragging(true);
+      event.preventDefault();
+    },
+    [isRolling]
+  );
+
+  const handlePointerUp = useCallback(() => {
+    if (isRolling || !isDragging) return;
+
+    setIsDragging(false);
 
     if (controlPhase === "positioning") {
       setControlPhase("aiming");
     } else if (controlPhase === "aiming") {
       setControlPhase("power");
     }
-  }, [isRolling, controlPhase]);
+  }, [isRolling, isDragging, controlPhase]);
 
   const resetBall = useCallback(() => {
     if (ballRef.current) {
@@ -96,15 +117,37 @@ export const BowlingBall = ({ position = [0, 1, -5] }) => {
 
   useEffect(() => {
     const canvas = gl.domElement;
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("click", handleMouseClick);
+
+    // Mouse events
+    canvas.addEventListener("mousemove", handlePointerMove);
+    canvas.addEventListener("mousedown", handlePointerDown);
+    canvas.addEventListener("mouseup", handlePointerUp);
+
+    // Touch events
+    canvas.addEventListener("touchmove", handlePointerMove, { passive: false });
+    canvas.addEventListener("touchstart", handlePointerDown, {
+      passive: false,
+    });
+    canvas.addEventListener("touchend", handlePointerUp);
+
     canvas.style.cursor = isRolling ? "default" : "crosshair";
+    canvas.style.touchAction = "none"; // Prevent default touch behaviors
 
     return () => {
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("click", handleMouseClick);
+      canvas.removeEventListener("mousemove", handlePointerMove);
+      canvas.removeEventListener("mousedown", handlePointerDown);
+      canvas.removeEventListener("mouseup", handlePointerUp);
+      canvas.removeEventListener("touchmove", handlePointerMove);
+      canvas.removeEventListener("touchstart", handlePointerDown);
+      canvas.removeEventListener("touchend", handlePointerUp);
     };
-  }, [handleMouseMove, handleMouseClick, isRolling, gl.domElement]);
+  }, [
+    handlePointerMove,
+    handlePointerDown,
+    handlePointerUp,
+    isRolling,
+    gl.domElement,
+  ]);
 
   const lastVelocityCheck = useRef(0);
 
