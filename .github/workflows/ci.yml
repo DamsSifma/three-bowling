@@ -8,7 +8,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
@@ -22,6 +21,9 @@ jobs:
       # ---- Checkout ----
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
 
       - name: Docker metadata
         id: meta
@@ -64,18 +66,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: IMAGE_NAME
           script: |
             # Login to GHCR
             echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             # Pull latest image
-            docker pull ghcr.io/${{ github.repository }}:latest
+            docker pull ghcr.io/${IMAGE_NAME}:latest
 
             # Stop old container if running
             docker stop three-bowling || true
@@ -86,7 +92,7 @@ jobs:
               --name three-bowling \
               --restart unless-stopped \
               -p 80:80 \
-              ghcr.io/${{ github.repository }}:latest
+              ghcr.io/${IMAGE_NAME}:latest
 
             # Cleanup old images
             docker image prune -f
